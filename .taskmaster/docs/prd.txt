@@ -1,0 +1,174 @@
+# **Product Requirements Document: 911 Dispatch Scheduler**
+
+|  |  |
+| :---- | :---- |
+| **Document Version:** | 1.0 |
+| **Status:** | Draft |
+| **Author:** | Gemini AI (Collaborative Draft) |
+| **Last Updated:** | July 26, 2025 |
+
+## **1\. Introduction & Purpose**
+
+This document outlines the product requirements for the **911 Dispatch Scheduler**, a mission-critical web application designed to automate and manage the complex 24/7 scheduling needs of a 911 dispatch center.
+
+The current process of manual scheduling is time-consuming, prone to error, and struggles to balance strict staffing requirements with employee availability and preferences. This leads to coverage gaps, unfair shift distribution, and significant administrative overhead.
+
+The 911 Dispatch Scheduler will solve this by providing a secure, scalable, and intelligent platform that ensures optimal staffing levels, streamlines administrative tasks, and empowers employees with greater control over their schedules. This document will serve as the guiding source of truth for all stakeholders, including product managers, engineers, designers, and QA testers.
+
+## **2\. Product Vision & Strategic Goals**
+
+### **2.1. Vision**
+
+To be the definitive, intelligent scheduling solution for emergency response services, ensuring that every shift is perfectly staffed, resilient, and fair, thereby enhancing the well-being of dispatchers and the safety of the community they serve.
+
+### **2.2. Strategic Goals**
+
+* **Operational Efficiency:** Reduce the time required to generate a compliant 4-month schedule by over 90% compared to manual methods.  
+* **Compliance & Safety:** Achieve 100% compliance with all defined minimum staffing and supervisor coverage requirements in every generated schedule.  
+* **Employee Satisfaction:** Improve dispatcher satisfaction by providing schedule transparency, fairness, and self-service features like shift swapping and time-off requests.  
+* **Scalability & Reliability:** Build a robust, enterprise-grade platform that can scale to support multiple dispatch centers with zero downtime for critical functions.
+
+## **3\. User Personas**
+
+### **3.1. Administrator / Scheduler**
+
+* **Role:** Manages the entire system, including user accounts, site-wide settings, and the master schedule generation.  
+* **Needs & Goals:**  
+  * To generate complex, multi-month schedules that meet all constraints with minimal manual intervention.  
+  * To have a global view of staffing levels and the ability to manually adjust schedules to handle exceptions.  
+  * To manage user roles and permissions securely.  
+* **Pain Points:** The current manual process is a complex, error-prone puzzle that takes days or weeks to solve.
+
+### **3.2. Shift Supervisor**
+
+* **Role:** Manages a team of dispatchers, oversees daily operations, and handles first-level approvals.  
+* **Needs & Goals:**  
+  * To view their team's schedule at a glance to ensure their shifts are covered.  
+  * To approve or deny time-off and shift-swap requests based on operational needs.  
+  * To communicate effectively with their team about schedule changes.  
+* **Pain Points:** Lack of a centralized system for managing requests leads to communication breakdowns and difficulty in tracking approvals.
+
+### **3.3. Dispatcher (Employee)**
+
+* **Role:** A 911 dispatcher working assigned shifts.  
+* **Needs & Goals:**  
+  * To easily view their upcoming work schedule from any device.  
+  * To request time off and swap shifts with colleagues in a fair and transparent manner.  
+  * To have a consistent and predictable work pattern.  
+* **Pain Points:** Uncertainty about future schedules, cumbersome processes for requesting changes, and a feeling that shift distribution can be inequitable.
+
+## **4\. Phased Rollout & Feature Requirements**
+
+The project will be developed in strategic stages, building upon previous achievements to manage complexity and deliver value incrementally.
+
+### **Stage 1: MVP — Foundational Systems & Schedule Viewing**
+
+*Focus: Establish a secure, stable, and viewable system. The core objective is to build the non-negotiable foundation for all future features.*
+
+| ID | Feature | User Story |
+| :---- | :---- | :---- |
+| **FR-1.0** | **Robust Error Handling** | As a developer, I want a centralized error handling and logging system so that I can quickly diagnose and troubleshoot issues during development and in production. |
+| **FR-2.0** | **Authentication & RBAC** | As a user (Admin, Supervisor, Employee), I want to securely log in and access only the features and data relevant to my role. |
+| **FR-3.0** | **User Profile Management** | As a user, I want to view my basic profile information (name, role, contact info). |
+| **FR-4.0** | **Read-Only Schedule View** | As a user, I want to view the master schedule in an intuitive calendar or list format so that I know when I and others are scheduled to work. |
+| **FR-5.0** | **Seeded Test Data** | As a developer, I want a script to populate the database with realistic test data (employees, shifts, etc.) to validate the MVP functionality. |
+
+### **Stage 2: Enterprise — Core Scheduling & Management**
+
+*Focus: Introduce the core "magic" of the application—the automated scheduling engine and the tools for administrators to manage it.*
+
+| ID | Feature | User Story |
+| :---- | :---- | :---- |
+| **FR-6.0** | **Automated Schedule Generation** | As an Administrator, I want to trigger an automated process that generates a fully compliant 4-month schedule based on all defined rules, constraints, and priorities. |
+| **FR-7.0** | **Manual Schedule Management** | As an Administrator, I want to have full CRUD (Create, Read, Update, Delete) capabilities over the generated schedule to handle exceptions and make manual adjustments. |
+
+### **Stage 3: Enterprise — Employee Empowerment & Communication**
+
+*Focus: Enhance the platform with self-service features that improve quality of life for employees and streamline supervisor workflows.*
+
+| ID | Feature | User Story |
+| :---- | :---- | :---- |
+| **FR-8.0** | **Time-Off Management** | As an Employee, I want to submit time-off requests. As a Supervisor, I want to review and approve/deny these requests, which should then block off those times in the schedule. |
+| **FR-9.0** | **Shift Swapping** | As an Employee, I want to propose a shift swap with a qualified colleague. As a Supervisor, I want to approve/deny the swap, ensuring it doesn't violate any staffing rules. |
+| **FR-10.0** | **Integrated Chat** | As a user, I want a simple, real-time chat feature to communicate with my colleagues and supervisors directly within the application. |
+
+### **Stage 4: Enterprise — Reporting & Notifications**
+
+*Focus: Add enterprise-grade features for auditing, reporting, and proactive communication.*
+
+| ID | Feature | User Story |
+| :---- | :---- | :---- |
+| **FR-11.0** | **Real-time Notifications** | As a user, I want to receive in-app and/or email notifications for important events, such as a shift change, a request approval, or a new schedule being published. |
+| **FR-12.0** | **Auditing & Reporting** | As an Administrator, I want to generate reports on key metrics like overtime hours, staffing level compliance, and shift distribution to make data-driven decisions. |
+
+## **5\. Detailed Scheduling Logic & Constraints**
+
+The automated scheduling engine (**FR-6.0**) is the core of this application. It must adhere to the following rules, processed in the specified order of priority.
+
+### **5.1. Scheduling Priorities (Highest to Lowest)**
+
+1. **Primary Objective:** Ensure minimum staffing levels for all time periods are met.  
+2. **Supervisor Coverage:** Guarantee at least one supervisor is scheduled per time period.  
+3. **Honor Time Off:** Do not schedule an employee during an approved time-off period.  
+4. **Adhere to 40-Hour Limit:** Do not schedule employees for \>40 hours/week without manual override.  
+5. **Follow Employee Patterns:** Adhere to the assigned 4x10 or 3x12+1x4 patterns.  
+6. **Accommodate Pending Time Off:** Avoid scheduling during pending (non-approved) time-off requests if possible.  
+7. **Maintain Shift Consistency:** Keep employees on their default shift type (e.g., Day, Swing).  
+8. **Fairness:** Distribute shifts and necessary overtime equitably.
+
+### **5.2. Core Requirements**
+
+| Category | Requirement | Details |
+| :---- | :---- | :---- |
+| **Staffing Levels** | **Morning** | 5:00 AM – 9:00 AM: Min. 6 employees (incl. 1 supervisor) |
+|  | **Daytime** | 9:00 AM – 9:00 PM: Min. 8 employees (incl. 1 supervisor) |
+|  | **Evening** | 9:00 PM – 1:00 AM: Min. 7 employees (incl. 1 supervisor) |
+|  | **Night** | 1:00 AM – 5:00 AM: Min. 6 employees (incl. 1 supervisor) |
+| **Employee Patterns** | **Pattern A** | Four consecutive 10-hour shifts per week. |
+|  | **Pattern B** | Three consecutive 12-hour shifts \+ one 4-hour shift per week. |
+| **Shift Options** | **Early, Day, Swing, Graveyard** | A predefined list of 4-hour, 10-hour, and 12-hour shifts that the algorithm can assign. (See initial prompt for full list). |
+| **Constraints** | **Schedule Duration** | Schedules must be generated for a four-month period. |
+|  | **Midnight Spanning** | The system must correctly account for shifts that cross midnight and contribute to staffing levels on two separate days. |
+
+## **6\. Non-Functional Requirements**
+
+| ID | Category | Requirement |
+| :---- | :---- | :---- |
+| **NFR-1** | **Performance** | \- Page loads for interactive views (e.g., calendar) must be \< 2 seconds. \<br\>- API responses for data fetching must be \< 500ms. \<br\>- Automated schedule generation for a 4-month period should complete in a reasonable timeframe (TBD, target \< 5 minutes). |
+| **NFR-2** | **Security** | \- All data access must be protected by Supabase Row Level Security (RLS). \<br\>- All user input must be sanitized and validated with Zod. \<br\>- The application must be protected against common web vulnerabilities (XSS, CSRF). |
+| **NFR-3** | **Scalability** | \- The system must support at least 200 concurrent users without performance degradation. \<br\>- The database schema must be designed to scale to support 500+ employees. |
+| **NFR-4** | **Usability** | \- The user interface must be intuitive, responsive, and accessible on modern web browsers (Chrome, Firefox, Safari) and mobile devices. \<br\>- The application should strive for WCAG 2.1 AA compliance. |
+| **NFR-5** | **Reliability** | \- The application must have a target uptime of 99.9%. \<br\>- Critical functions like login and schedule viewing must be highly available. |
+
+## **7\. High-Level Data Schema**
+
+The following database tables are anticipated. The final schema will be defined in the ARCHITECTURE.md document.
+
+* users: Stores user profile information, links to Supabase auth.  
+* roles: Defines user roles (admin, supervisor, employee).  
+* user\_roles: Maps users to roles.  
+* shifts: Defines all possible shift templates (e.g., "Day Shift 10hr", 9am-7pm).  
+* staffing\_requirements: Defines the minimum employee and supervisor counts for different time blocks.  
+* assigned\_shifts: The main schedule table, linking a user to a shift on a specific date.  
+* time\_off\_requests: Stores employee requests for time off, including status (pending, approved, denied).  
+* schedule\_periods: Defines the 4-month blocks for which schedules are generated.
+
+## **8\. Success Metrics**
+
+| Metric | Target | Measurement Method |
+| :---- | :---- | :---- |
+| **Time to Generate Schedule** | \< 5 minutes | System logs |
+| **Manual Adjustments per Schedule** | \< 5% of total shifts | Database query on assigned\_shifts table (tracking is\_manual\_override) |
+| **Staffing Compliance Rate** | 100% | Automated validation script run against every generated schedule |
+| **User Satisfaction (CSAT)** | \> 8/10 | Quarterly user surveys |
+| **Feature Adoption Rate** | \> 75% of users using Time Off & Shift Swap features within 3 months of launch | Product analytics |
+
+## **9\. Out of Scope for v1.0**
+
+The following features will NOT be included in the initial release cycles but may be considered for future versions:
+
+* Payroll and timesheet integration.  
+* Integration with external HRIS systems.  
+* Advanced predictive analytics for staffing needs.  
+* Mobile native applications (the web app will be mobile-responsive).  
+* Bidding for open shifts.

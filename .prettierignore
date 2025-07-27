@@ -1,0 +1,11 @@
+# Ignore artifacts:
+node_modules
+.next
+.taskmaster
+.env.local
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Ignore documentation
+*.md

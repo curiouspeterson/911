@@ -1,0 +1,16 @@
+# Task ID: 11
+# Title: Shift Swapping System
+# Status: pending
+# Dependencies: 6, 9
+# Priority: medium
+# Description: Develop functionality for employees to propose and supervisors to approve/deny shift swaps (FR-9.0).
+# Details:
+1. Create shift swap components (Proposal form, status tracking).
+2. Implement supervisor approval interface.
+3. Create shift swap Server Actions.
+4. Implement business logic for swap validation (qualifications, conflicts).
+
+# Test Strategy:
+1. Integration tests for the complete swap workflow.
+2. Test approval/denial processes.
+3. Verify qualification checking.

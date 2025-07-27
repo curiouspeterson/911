@@ -1,0 +1,16 @@
+# Task ID: 13
+# Title: Real-time Notification System
+# Status: pending
+# Dependencies: 3, 6
+# Priority: medium
+# Description: Implement in-app and email notifications (FR-11.0).
+# Details:
+1. Design notification database schema.
+2. Implement notification service (In-app via Supabase Realtime, Email via SendGrid).
+3. Create notification components (Notification center, toasts).
+4. Implement notification triggers for key events.
+
+# Test Strategy:
+1. Integration tests for delivery across channels.
+2. Test notification preferences.
+3. Validate notification triggers for all event types.

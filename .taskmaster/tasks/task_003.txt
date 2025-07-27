@@ -1,0 +1,17 @@
+# Task ID: 3
+# Title: Authentication and Role-Based Access Control (RBAC)
+# Status: pending
+# Dependencies: 1, 2, 4
+# Priority: high
+# Description: Extend the existing Supabase Auth to include application-specific roles and permissions (FR-2.0).
+# Details:
+1. Implement the database schema for `roles` and `user_roles`.
+2. Create a trigger or server-side function to assign a default role on user sign-up.
+3. Implement role-based access control within Server Actions and Middleware by checking against the `roles` table.
+4. Adapt existing auth UI components if necessary and build admin UI for role management.
+
+# Test Strategy:
+1. Unit tests for permission checking functions.
+2. Integration tests for role assignment on signup.
+3. Test RLS policies with different user roles.
+4. Verify protected routes and actions are correctly restricted by role.

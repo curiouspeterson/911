@@ -1,0 +1,13 @@
+# Task ID: 7
+# Title: Test Data Generation Script
+# Status: pending
+# Dependencies: 4
+# Priority: medium
+# Description: Create a script to populate the database with realistic test data (FR-5.0).
+# Details:
+1. Implement a data seeding utility using TypeScript and the Supabase client.
+2. Generate realistic test data for users, shifts, staffing requirements, and sample schedules.
+
+# Test Strategy:
+1. Verify all generated data meets the schema requirements.
+2. Test data consistency and referential integrity.

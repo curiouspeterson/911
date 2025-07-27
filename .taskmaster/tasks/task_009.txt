@@ -1,0 +1,17 @@
+# Task ID: 9
+# Title: Manual Schedule Management Interface
+# Status: pending
+# Dependencies: 6, 8
+# Priority: high
+# Description: Create an interface for administrators to manually adjust generated schedules (FR-7.0).
+# Details:
+1. Implement schedule management components (Drag-and-drop, shift editing modal).
+2. Create schedule management Server Actions for CRUD operations.
+3. Implement real-time updates using Supabase subscriptions.
+4. Add audit logging for all manual changes.
+
+# Test Strategy:
+1. Unit tests for schedule editing components.
+2. Integration tests for Server Actions.
+3. Test constraint validation logic.
+4. Verify audit logging works correctly.

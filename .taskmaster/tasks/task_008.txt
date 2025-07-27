@@ -1,0 +1,17 @@
+# Task ID: 8
+# Title: Automated Schedule Generation Algorithm
+# Status: pending
+# Dependencies: 0 (Not found), 4, 7
+# Priority: high
+# Description: Develop the core scheduling engine that generates compliant 4-month schedules (FR-6.0).
+# Details:
+1. Implement a constraint-based scheduling algorithm using Google OR-Tools, based on the successful POC from Task 0.
+2. Define all scheduling constraints from the PRD in the solver.
+3. Implement schedule generation as a Server Action.
+4. Add detailed logging and validation for the scheduling process.
+
+# Test Strategy:
+1. Unit tests for individual constraints.
+2. Integration tests for the complete algorithm.
+3. Performance testing with realistic data volumes.
+4. Validation tests to ensure all constraints are satisfied.

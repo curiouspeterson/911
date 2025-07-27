@@ -1,0 +1,37 @@
+# Task ID: 0
+# Title: Task 0: Algorithm Spike - Scheduling Engine Proof-of-Concept
+# Status: pending
+# Dependencies: None
+# Priority: critical
+# Description: De-risk the project by building a focused proof-of-concept (POC) of the core scheduling algorithm using Google OR-Tools and dummy data. This task must validate the technical feasibility of solving the primary scheduling constraints before full application development begins.
+# Details:
+1. Define a minimal, representative subset of scheduling constraints from the PRD (Section 5.1 & 5.2).
+2. Create a script with hardcoded dummy data (e.g., 20 employees, 1 month of shifts).
+3. Implement a basic constraint model using Google OR-Tools to solve for the dummy data.
+4. The primary goal is to confirm that a valid schedule can be generated, not to build a production-ready engine.
+5. Document the findings, including performance metrics and any identified challenges or limitations.
+
+# Test Strategy:
+1. The success of this task is a binary outcome: does the POC script successfully generate a valid schedule that meets the core constraints?
+2. Verify the output schedule manually against the dummy data and constraints.
+3. Measure the time taken to generate the schedule.
+
+# Subtasks:
+## 1. Define POC Scope and Dummy Data Structure [pending]
+### Dependencies: None
+### Description: Select the most critical constraints (e.g., min staffing, 40-hour week) and design a simple TypeScript interface for the dummy data.
+### Details:
+
+
+## 2. Implement OR-Tools Constraint Solver Script [pending]
+### Dependencies: 0.1
+### Description: Write the core POC script that models the constraints and attempts to find a solution.
+### Details:
+
+
+## 3. Analyze Results and Document Findings [pending]
+### Dependencies: 0.2
+### Description: Run the script, analyze the generated schedule for correctness, and write a summary report of the findings, including a recommendation to proceed.
+### Details:
+
+

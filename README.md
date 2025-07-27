@@ -1,105 +1,139 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+911 Dispatch Scheduler
+A mission-critical, 24/7 scheduling application designed to manage the complex staffing requirements of a 911 dispatch center. This platform ensures optimal coverage, respects employee constraints, and provides a scalable, secure, and intuitive interface for schedulers and staff.
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+## Vision & Core Mission
+The primary goal of this project is to eliminate scheduling conflicts, reduce administrative overhead, and ensure that 911 dispatch centers are never understaffed. By leveraging a powerful scheduling algorithm and a modern, real-time technology stack, this application aims to provide a robust solution that is both powerful for administrators and easy to use for employees.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+## ✨ Core Features
+The application is being developed in strategic stages, starting with a robust MVP and scaling to a full enterprise-grade solution.
 
-## Features
+### MVP (Minimum Viable Product)
+- **Secure Authentication**: Role-based access control (RBAC) for employees, supervisors, and administrators using Supabase Auth.
+- **Schedule Viewing**: An intuitive, read-only calendar interface for all users to view their assigned shifts.
+- **User Profiles**: Basic user profile management.
+- **Seeded Data**: The initial version will use pre-populated, realistic test data to demonstrate core scheduling logic.
+- **Robust Error Handling**: A comprehensive error handling and logging system built from the ground up.
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+### Enterprise Features (Post-MVP)
+- **Automated Schedule Generation**: A sophisticated algorithm that generates optimized 4-month schedules based on staffing requirements, employee patterns, and time-off requests.
+- **Dynamic Schedule Management**: Full CRUD (Create, Read, Update, Delete) capabilities for administrators to manage schedules.
+- **Shift Swapping & Bidding**: A system for employees to request shift swaps, subject to supervisor approval.
+- **Time-Off Management**: A complete workflow for employees to request time off and for supervisors to approve or deny requests.
+- **Real-time Notifications**: In-app and email notifications for shift changes, approvals, and important announcements.
+- **Integrated Chat**: A real-time chat system for seamless communication within the dispatch center.
+- **Comprehensive Auditing & Reporting**: Detailed logs and reporting on schedule changes, overtime, and staffing levels.
 
-## Demo
+## ️ Technology Stack
+This project is built with a focus on performance, security, and developer experience, using modern, best-in-class technologies.
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+| Category         | Technology                                    |
+| :--------------- | :-------------------------------------------- |
+| Framework        | Next.js 15+ (App Router)                      |
+| Language         | TypeScript (Strict Mode)                      |
+| Backend & DB     | Supabase (PostgreSQL, Auth with RLS, Storage, Realtime) |
+| UI Components    | shadcn/ui & Radix UI                          |
+| Styling          | Tailwind CSS                                  |
+| Testing          | Vitest & React Testing Library                |
+| Schema & Validation | Zod                                           |
+| Deployment       | Vercel                                        |
 
-## Deploy to Vercel
+## Project Structure
+The codebase is organized following Next.js App Router conventions and a clean architecture approach to separate concerns.
 
-Vercel deployment will guide you through creating a Supabase account and project.
+```
+. 
+├── app/                  # Next.js App Router: pages, layouts, server actions
+│   ├── (auth)/           # Authentication routes (login, logout)
+│   ├── dashboard/        # Main application dashboard
+│   ├── api/              # API routes
+│   └── actions/          # Server Actions for data mutations
+├── components/           # Shared React components (UI, forms, etc.)
+│   └── ui/               # Unstyled components from shadcn/ui
+├── lib/                  # Core logic, utilities, and third-party integrations
+│   └── supabase/         # Supabase client, server, and query logic
+├── documentation/        # Project planning and architecture documents
+│   ├── ARCHITECTURE.md   # System architecture and data models
+│   └── SPEC.md           # Detailed feature specifications
+├── styles/               # Global CSS styles
+├── types/                # TypeScript type definitions
+├── .gemini               # AI coding assistant rules file
+└── package.json
+```
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+## Getting Started
+Follow these steps to set up and run the project locally.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+### Prerequisites
+- Node.js (v20.x or later)
+- pnpm (recommended package manager)
+- Git
+- A Supabase account
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+### 1. Clone the Repository
+```bash
+git clone https://github.com/your-username/911-scheduler.git
+cd 911-scheduler
+```
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+### 2. Install Dependencies
+```bash
+pnpm install
+```
 
-## Clone and run locally
+### 3. Set Up Environment Variables
+Create a `.env.local` file in the root of the project by copying the example file:
+```bash
+cp .env.example .env.local
+```
+Log in to your Supabase account and navigate to your project's settings:
+- **API Settings**: Find your Project URL and anon public key.
+- **Database Settings**: Find your database connection string.
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+Update your `.env.local` file with these values:
+```
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=YOUR_PROJECT_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_ANON_PUBLIC_KEY
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVICE_ROLE_KEY # Found in API settings
+DATABASE_URL=YOUR_POSTGRES_CONNECTION_STRING # Found in Database settings
+```
 
-2. Create a Next.js app using the Supabase Starter template npx command
+### 4. Set Up Supabase Database
+Run the schema migrations located in the `supabase/migrations` directory to set up your database tables and RLS policies.
+```bash
+# This assumes you have the Supabase CLI installed and linked
+supabase db push
+```
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
+### 5. Run the Development Server
+```bash
+pnpm dev
+```
+The application should now be running at `http://localhost:3000`.
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
+## Running Tests
+This project enforces a strict Test-Driven Development (TDD) workflow. All code requires comprehensive testing.
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
+To run the full test suite:
+```bash
+pnpm test
+```
+To run tests in watch mode during development:
+```bash
+pnpm test:watch
+```
 
-3. Use `cd` to change into the app's directory
+## Contributing
+Contributions are welcome! We adhere to a strict TDD and conventional commit process. Before contributing, please review the AI pairing rules defined in the `.gemini` file.
 
-   ```bash
-   cd with-supabase-app
-   ```
+- Fork the repository.
+- Create a new feature branch: `git checkout -b feature/your-feature-name`
+- Write tests first: Create a `*.test.tsx` file that outlines the functionality.
+- Write the code: Implement the feature to make the tests pass.
+- Ensure all tests pass: `pnpm test`
+- Submit a pull request.
 
-4. Rename `.env.example` to `.env.local` and update the following:
+## License
+This project is licensed under the MIT License. See the `LICENSE` file for details.
 
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
-
-5. You can now run the Next.js local development server:
-
-   ```bash
-   npm run dev
-   ```
-
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
-
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
-
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
-
-## Feedback and issues
-
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
-
-## More Supabase examples
-
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)

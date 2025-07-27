@@ -1,0 +1,56 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run tests
+        # Add a test script to package.json first
+        # run: npm test
+        run: echo "No tests configured yet."
+
+      - name: Build project
+        run: npm run build
+
+  cd:
+    name: Continuous Deployment
+    needs: ci
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy to Vercel
+        run: echo "Deployment to Vercel would happen here."
+        # This step would typically use the Vercel CLI or a GitHub Action
+        # and require secrets for authentication.
+        # Example:
+        # - name: Deploy to Vercel
+        #   uses: amondnet/vercel-action@v20
+        #   with:
+        #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
+        #     vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+        #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
