@@ -369,27 +369,31 @@
           4,
           6
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
             "title": "Build Time-Off Request Form & Action",
-            "description": "Create the UI and Server Action for dispatchers to submit new time-off requests."
+            "description": "Create the UI and Server Action for dispatchers to submit new time-off requests.",
+            "status": "done"
           },
           {
             "id": 2,
             "title": "Build 'My Requests' View",
-            "description": "Create a page for dispatchers to view the status and history of their own time-off requests."
+            "description": "Create a page for dispatchers to view the status and history of their own time-off requests.",
+            "status": "done"
           },
           {
             "id": 3,
             "title": "Build Supervisor Approval Queue",
-            "description": "Create the UI for supervisors to see a list of pending requests, including any potential staffing conflicts."
+            "description": "Create the UI for supervisors to see a list of pending requests, including any potential staffing conflicts.",
+            "status": "done"
           },
           {
             "id": 4,
             "title": "Create Approval/Denial Server Actions",
-            "description": "Write the Server Actions for supervisors to approve or deny requests, which will update the request status and trigger notifications."
+            "description": "Write the Server Actions for supervisors to approve or deny requests, which will update the request status and trigger notifications.",
+            "status": "done"
           }
         ]
       },
@@ -407,12 +411,14 @@
           {
             "id": 1,
             "title": "Build 'Propose Swap' UI & Action",
-            "description": "Create the UI for a dispatcher to select one of their shifts and propose a swap with an eligible colleague."
+            "description": "Create the UI for a dispatcher to select one of their shifts and propose a swap with an eligible colleague.",
+            "status": "done"
           },
           {
             "id": 2,
             "title": "Build Swap Response UI & Action",
-            "description": "Create the UI for the targeted employee to view and either accept or reject the swap proposal."
+            "description": "Create the UI for the targeted employee to view and either accept or reject the swap proposal.",
+            "status": "done"
           },
           {
             "id": 3,
@@ -561,11 +567,24 @@
             "description": "Perform a security review, including scanning for dependency vulnerabilities and manually testing RLS policies for potential bypasses."
           }
         ]
+      },
+      {
+        "id": 16,
+        "title": "Implement Core Scheduling Engine",
+        "description": "Implement the core scheduling algorithm in `lib/scheduling/engine.ts`. This includes constraint handling, optimization logic, and gap filling to ensure proper staff coverage. This is a prerequisite for FR-7.0, FR-8.0, and FR-9.0.",
+        "details": "",
+        "testStrategy": "",
+        "status": "done",
+        "dependencies": [
+          9
+        ],
+        "priority": "high",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-07-27T01:06:31.014Z",
-      "updated": "2025-07-27T03:30:00.000Z",
+      "updated": "2025-07-28T18:15:39.269Z",
       "description": "Tasks for master context. Pivoted from node_or_tools to a custom TypeScript scheduling algorithm and added comprehensive subtasks for all complex items."
     }
   }

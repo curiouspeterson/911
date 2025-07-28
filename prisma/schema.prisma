@@ -21,20 +21,53 @@ model Role {
 }
 
 model Shift {
-  id                     BigInt     @id @default(autoincrement())
+  id                     BigInt         @id @default(autoincrement())
   schedule_id            BigInt
-  startTime              DateTime   @map("start_time") @db.Timestamptz(6)
-  endTime                DateTime   @map("end_time") @db.Timestamptz(6)
-  assigned_employee_id   String?    @db.Uuid
-  required_qualification String?
-  department             String?
-  created_at             DateTime   @default(now()) @db.Timestamptz(6)
-  employees              employees? @relation(fields: [assigned_employee_id], references: [id], onUpdate: NoAction)
-  schedules              Schedule   @relation(fields: [schedule_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  startTime              DateTime       @map("start_time") @db.Timestamptz(6)
+  endTime                DateTime       @map("end_time") @db.Timestamptz(6)
+  assigned_employee_id   String?        @db.Uuid
+  department_id          BigInt?
+  created_at             DateTime       @default(now()) @db.Timestamptz(6)
+  employees              employees?     @relation(fields: [assigned_employee_id], references: [id], onUpdate: NoAction)
+  schedules              Schedule       @relation(fields: [schedule_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  department             Department?    @relation(fields: [department_id], references: [id], onUpdate: NoAction)
+  shiftRequirements      ShiftRequirement[]
 
   @@map("shifts")
   @@schema("public")
 }
+
+model Qualification {
+  id                      BigInt                    @id @default(autoincrement())
+  name                    String                    @unique
+  employeeQualifications EmployeeQualification[]
+  shiftRequirements       ShiftRequirement[]
+
+  @@map("qualifications")
+  @@schema("public")
+}
+
+model ShiftRequirement {
+  id               BigInt        @id @default(autoincrement())
+  shift_id         BigInt
+  qualification_id BigInt
+  shift            Shift         @relation(fields: [shift_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  qualification    Qualification @relation(fields: [qualification_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("shift_requirements")
+  @@schema("public")
+}
+
+model Department {
+  id        BigInt      @id @default(autoincrement())
+  name      String      @unique
+  shifts    Shift[]
+  employees employees[]
+
+  @@map("departments")
+  @@schema("public")
+}
+
 
 model Schedule {
   id           BigInt   @id @default(autoincrement())
@@ -44,8 +77,20 @@ model Schedule {
   is_published Boolean  @default(false)
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   shifts       Shift[]
+  scheduleLogs ScheduleLog[]
 
   @@map("schedules")
+  @@schema("public")
+}
+
+model ScheduleLog {
+  id          BigInt   @id @default(autoincrement())
+  schedule_id BigInt
+  change      String
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  schedule    Schedule @relation(fields: [schedule_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("schedule_logs")
   @@schema("public")
 }
 
@@ -375,40 +420,340 @@ model users {
   one_time_tokens             one_time_tokens[]
   sessions                    sessions[]
   employee                    employees?
+  userPreferences             UserPreferences?
+  reports                     Report[]
+  helpTickets                 HelpTicket[]
+  sentMessages                Message[]                 @relation("sent_messages")
+  receivedMessages            Message[]                 @relation("received_messages")
+  chatMessages                ChatMessage[]
+  chatRoomUsers               ChatRoomUser[]
+  auditLogs                   AuditLog[]
+  incidentReports             IncidentReport[]
+  surveys                     Survey[]
+  vehicleAssignments          VehicleAssignment[]
 
   @@index([instance_id])
   @@index([is_anonymous])
   @@schema("auth")
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model employee_roles {
+  id          BigInt    @id @default(autoincrement())
   employee_id String    @db.Uuid
   role_id     BigInt
   employees   employees @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   roles       Role      @relation(fields: [role_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@id([employee_id, role_id])
   @@schema("public")
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model employees {
-  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  user_id           String?          @unique @db.Uuid
-  first_name        String
-  last_name         String
-  email             String           @unique
-  phone_number      String?
-  department        String?
-  created_at        DateTime         @default(now()) @db.Timestamptz(6)
-  employee_roles    employee_roles[]
-  shifts            Shift[]
-  time_off_requests TimeOffRequest[]
-  users             users?           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id                      String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id                 String?                   @unique @db.Uuid
+  first_name              String
+  last_name               String
+  email                   String                    @unique
+  phone_number            String?
+  department_id           BigInt?
+  created_at              DateTime                  @default(now()) @db.Timestamptz(6)
+  employee_roles          employee_roles[]
+  shifts                  Shift[]
+  time_off_requests       TimeOffRequest[]
+  users                   users?                    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  department              Department?               @relation(fields: [department_id], references: [id], onUpdate: NoAction)
+  employeeQualifications EmployeeQualification[]
+  notifications           Notification[]
+  payrolls                Payroll[]
+  leaveRequests           LeaveRequest[]
+  trainings               Training[]
+  performanceReviews      PerformanceReview[]
+  emergencyContacts       EmergencyContact[]
+  documents               Document[]
+  assets                  Asset[]
+  vehicleAssignments      VehicleAssignment[]
 
+  @@schema("public")
+}
+
+model EmployeeQualification {
+  id               BigInt        @id @default(autoincrement())
+  employee_id      String        @db.Uuid
+  qualification_id BigInt
+  employees        employees     @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  qualification    Qualification @relation(fields: [qualification_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("employee_qualifications")
+  @@schema("public")
+}
+
+model Notification {
+  id          BigInt    @id @default(autoincrement())
+  employee_id String    @db.Uuid
+  message     String
+  is_read     Boolean   @default(false)
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+  employees   employees @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("notifications")
+  @@schema("public")
+}
+
+model SystemSetting {
+  id    BigInt @id @default(autoincrement())
+  key   String @unique
+  value String
+
+  @@map("system_settings")
+  @@schema("public")
+}
+
+model UserPreferences {
+  id      String @id @db.Uuid
+  user    users  @relation(fields: [id], references: [id], onDelete: Cascade)
+  preferences Json
+
+  @@map("user_preferences")
+  @@schema("public")
+}
+
+model Report {
+  id          BigInt   @id @default(autoincrement())
+  name        String
+  data        Json
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  generatedBy String   @db.Uuid
+  users       users    @relation(fields: [generatedBy], references: [id], onUpdate: NoAction)
+
+  @@map("reports")
+  @@schema("public")
+}
+
+model HelpTicket {
+  id          BigInt   @id @default(autoincrement())
+  user_id     String   @db.Uuid
+  subject     String
+  description String
+  status      String   @default("open")
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @updatedAt @db.Timestamptz(6)
+  users       users    @relation(fields: [user_id], references: [id], onUpdate: NoAction)
+
+  @@map("help_tickets")
+  @@schema("public")
+}
+
+model Message {
+  id          BigInt   @id @default(autoincrement())
+  sender_id   String   @db.Uuid
+  receiver_id String   @db.Uuid
+  content     String
+  is_read     Boolean  @default(false)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  sender      users    @relation("sent_messages", fields: [sender_id], references: [id], onUpdate: NoAction)
+  receiver    users    @relation("received_messages", fields: [receiver_id], references: [id], onUpdate: NoAction)
+
+  @@map("messages")
+  @@schema("public")
+}
+
+model ChatRoom {
+  id        BigInt         @id @default(autoincrement())
+  name      String
+  messages  ChatMessage[]
+  users     ChatRoomUser[]
+
+  @@map("chat_rooms")
+  @@schema("public")
+}
+
+model ChatRoomUser {
+  id           BigInt   @id @default(autoincrement())
+  chat_room_id BigInt
+  user_id      String   @db.Uuid
+  chatRoom     ChatRoom @relation(fields: [chat_room_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user         users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("chat_room_users")
+  @@schema("public")
+}
+
+model ChatMessage {
+  id           BigInt   @id @default(autoincrement())
+  chat_room_id BigInt
+  user_id      String   @db.Uuid
+  content      String
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  chatRoom     ChatRoom @relation(fields: [chat_room_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user         users    @relation(fields: [user_id], references: [id], onUpdate: NoAction)
+
+  @@map("chat_messages")
+  @@schema("public")
+}
+
+model AuditLog {
+  id        BigInt   @id @default(autoincrement())
+  user_id   String   @db.Uuid
+  action    String
+  details   Json?
+  timestamp DateTime @default(now()) @db.Timestamptz(6)
+  user      users    @relation(fields: [user_id], references: [id], onUpdate: NoAction)
+
+  @@map("audit_logs")
+  @@schema("public")
+}
+
+model Backup {
+  id         BigInt   @id @default(autoincrement())
+  file_path  String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("backups")
+  @@schema("public")
+}
+
+model Payroll {
+  id          BigInt    @id @default(autoincrement())
+  employee_id String    @db.Uuid
+  pay_rate    Float
+  pay_period  String
+  deductions  Json?
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime  @updatedAt @db.Timestamptz(6)
+  employee    employees @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("payrolls")
+  @@schema("public")
+}
+
+model LeaveRequest {
+  id          BigInt    @id @default(autoincrement())
+  employee_id String    @db.Uuid
+  leave_type  String
+  start_date  DateTime  @db.Date
+  end_date    DateTime  @db.Date
+  reason      String?
+  status      String    @default("pending")
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime  @updatedAt @db.Timestamptz(6)
+  employee    employees @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("leave_requests")
+  @@schema("public")
+}
+
+model Training {
+  id          BigInt    @id @default(autoincrement())
+  employee_id String    @db.Uuid
+  name        String
+  date        DateTime  @db.Date
+  hours       Int
+  employee    employees @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("trainings")
+  @@schema("public")
+}
+
+model PerformanceReview {
+  id          BigInt    @id @default(autoincrement())
+  employee_id String    @db.Uuid
+  review_date DateTime  @db.Date
+  reviewer    String
+  comments    String
+  rating      Int
+  employee    employees @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("performance_reviews")
+  @@schema("public")
+}
+
+model EmergencyContact {
+  id          BigInt    @id @default(autoincrement())
+  employee_id String    @db.Uuid
+  name        String
+  relationship String
+  phone       String
+  employee    employees @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("emergency_contacts")
+  @@schema("public")
+}
+
+model Document {
+  id          BigInt    @id @default(autoincrement())
+  employee_id String    @db.Uuid
+  name        String
+  url         String
+  uploaded_at DateTime  @default(now()) @db.Timestamptz(6)
+  employee    employees @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("documents")
+  @@schema("public")
+}
+
+model Asset {
+  id           BigInt    @id @default(autoincrement())
+  employee_id  String?   @db.Uuid
+  name         String
+  type         String
+  serialNumber String    @unique
+  assigned_at  DateTime? @db.Timestamptz(6)
+  employee     employees? @relation(fields: [employee_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@map("assets")
+  @@schema("public")
+}
+
+model IncidentReport {
+  id          BigInt    @id @default(autoincrement())
+  user_id     String    @db.Uuid
+  title       String
+  description String
+  date        DateTime  @db.Date
+  created_at  DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime  @updatedAt @db.Timestamptz(6)
+  user        users     @relation(fields: [user_id], references: [id], onUpdate: NoAction)
+
+  @@map("incident_reports")
+  @@schema("public")
+}
+
+model Survey {
+  id          BigInt   @id @default(autoincrement())
+  user_id     String   @db.Uuid
+  title       String
+  questions   Json
+  responses   Json?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @updatedAt @db.Timestamptz(6)
+  user        users    @relation(fields: [user_id], references: [id], onUpdate: NoAction)
+
+  @@map("surveys")
+  @@schema("public")
+}
+
+model Vehicle {
+  id           BigInt              @id @default(autoincrement())
+  name         String
+  type         String
+  vin          String              @unique
+  assignments  VehicleAssignment[]
+
+  @@map("vehicles")
+  @@schema("public")
+}
+
+model VehicleAssignment {
+  id          BigInt    @id @default(autoincrement())
+  vehicle_id  BigInt
+  employee_id String    @db.Uuid
+  user_id     String?   @db.Uuid
+  assigned_at DateTime  @default(now()) @db.Timestamptz(6)
+  returned_at DateTime? @db.Timestamptz(6)
+  vehicle     Vehicle   @relation(fields: [vehicle_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  employee    employees @relation(fields: [employee_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user        users?    @relation(fields: [user_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  @@map("vehicle_assignments")
   @@schema("public")
 }
 

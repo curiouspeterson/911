@@ -1,6 +1,16 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import {
+  getUserTimeOffRequests as dbGetUserTimeOffRequests,
+  insertTimeOffRequest as dbInsertTimeOffRequest,
+  getPendingTimeOffRequests as dbGetPendingTimeOffRequests,
+  updateTimeOffRequestStatus as dbUpdateTimeOffRequestStatus,
+  getUserShifts as dbGetUserShifts,
+  getEligibleSwapEmployees as dbGetEligibleSwapEmployees,
+  createSwapProposal as dbCreateSwapProposal,
+  updateSwapProposalStatus as dbUpdateSwapProposalStatus,
+} from '@/lib/supabase/queries';
+import { createServerClient, createClient } from '@/lib/supabase/server';
 import { generateSchedule } from '@/lib/scheduling/engine';
 import {
   SchedulableEmployee,
@@ -101,7 +111,7 @@ export const updateAssignedShift = withRoleCheck(
       Object.fromEntries(formData.entries())
     );
     if (!validatedFields.success) {
-      return { success: false, error: 'Invalid data.' };
+      return { success: false, error: { message: 'Invalid data.' } };
     }
 
     const { shiftId, newUserId, newDate } = validatedFields.data;
@@ -111,7 +121,7 @@ export const updateAssignedShift = withRoleCheck(
       .update({ user_id: newUserId, shift_date: newDate })
       .eq('id', shiftId);
 
-    if (error) return { success: false, error: error.message };
+    if (error) return { success: false, error: { message: error.message } };
     revalidatePath('/schedule');
     return { success: true };
   }
@@ -135,8 +145,195 @@ export const deleteAssignedShift = withRoleCheck(
       .delete()
       .eq('id', shiftId);
 
-    if (error) return { success: false, error: error.message };
+    if (error) return { success: false, error: { message: error.message } };
     revalidatePath('/schedule');
     return { success: true };
   }
 );
+
+// --- Time-Off Management ---
+
+const TimeOffRequestSchema = z.object({
+  startDate: z.date(),
+  endDate: z.date(),
+  reason: z.string().optional(),
+});
+
+export const createTimeOffRequest = async (input: {
+  startDate: Date;
+  endDate: Date;
+  reason?: string;
+}) => {
+  'use server';
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return { success: false, error: 'Not authenticated' };
+  }
+
+  const validatedFields = TimeOffRequestSchema.safeParse(input);
+
+  if (!validatedFields.success) {
+    return {
+      success: false,
+      error: 'Invalid data provided.',
+    };
+  }
+
+  const { startDate, endDate, reason } = validatedFields.data;
+
+  const { data, error } = await dbInsertTimeOffRequest({
+    employee_id: user.id,
+    start_date: startDate,
+    end_date: endDate,
+    reason: reason,
+    status: 'pending',
+  });
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath('/protected/profile'); // Or wherever the user's requests are displayed
+  return { success: true, data };
+};
+
+export const getUserTimeOffRequests = async (supabaseClient?: any) => {
+  'use server';
+
+  const supabase = supabaseClient || (await createClient());
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return { success: false, error: 'Not authenticated' };
+  }
+
+  const { data, error } = await dbGetUserTimeOffRequests(user.id);
+
+  if (error) {
+    return { success: false, error: error.message };
+  }
+
+  return { success: true, data };
+};
+
+export const getPendingTimeOffRequests = withRoleCheck(
+  ['supervisor', 'admin'],
+  async () => {
+    'use server';
+    const { data, error } = await dbGetPendingTimeOffRequests();
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    return { success: true, data };
+  }
+);
+
+export const approveTimeOffRequest = withRoleCheck(
+  ['supervisor', 'admin'],
+  async (requestId: string) => {
+    'use server';
+    const { data, error } = await dbUpdateTimeOffRequestStatus(
+      requestId,
+      'approved'
+    );
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    revalidatePath('/protected/supervisor/requests');
+    return { success: true, data };
+  }
+);
+
+export const denyTimeOffRequest = withRoleCheck(
+  ['supervisor', 'admin'],
+  async (requestId: string) => {
+    'use server';
+    const { data, error } = await dbUpdateTimeOffRequestStatus(
+      requestId,
+      'denied'
+    );
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    revalidatePath('/protected/supervisor/requests');
+    return { success: true, data };
+  }
+);
+
+// --- Swap Management ---
+
+export const acceptSwap = async (proposalId: string) => {
+  'use server';
+  const { data, error } = await dbUpdateSwapProposalStatus(
+    proposalId,
+    'accepted'
+  );
+  if (error) {
+    return { success: false, error: { message: error.message } };
+  }
+  revalidatePath('/protected/dashboard'); // Or wherever swap proposals are displayed
+  return { success: true, data };
+};
+
+export const rejectSwap = async (proposalId: string) => {
+  'use server';
+  const { data, error } = await dbUpdateSwapProposalStatus(
+    proposalId,
+    'rejected'
+  );
+  if (error) {
+    return { success: false, error: { message: error.message } };
+  }
+  revalidatePath('/protected/dashboard'); // Or wherever swap proposals are displayed
+  return { success: true, data };
+};
+
+export const getUserShifts = async () => {
+  'use server';
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return { success: false, error: 'Not authenticated' };
+  }
+  const { data, error } = await dbGetUserShifts(user.id);
+  if (error) {
+    return { success: false, error: error.message };
+  }
+  return { success: true, data };
+};
+
+export const getEligibleSwapEmployees = async (shiftId: string) => {
+  'use server';
+  const { data, error } = await dbGetEligibleSwapEmployees(shiftId);
+  if (error) {
+    return { success: false, error: error.message };
+  }
+  return { success: true, data };
+};
+
+export const proposeSwap = async (proposal: {
+  fromShiftId: string;
+  toEmployeeId: string;
+}) => {
+  'use server';
+  const { data, error } = await dbCreateSwapProposal({
+    from_shift_id: proposal.fromShiftId,
+    to_employee_id: proposal.toEmployeeId,
+    status: 'pending',
+  });
+  if (error) {
+    return { success: false, error: error.message };
+  }
+  return { success: true, data };
+};

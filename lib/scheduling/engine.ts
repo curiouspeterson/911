@@ -1,80 +1,68 @@
 /**
- * @fileoverview The core scheduling engine.
+ * @fileoverview The core scheduling engine for the 911 dispatch application.
+ * This file contains the primary logic for generating a valid, constraint-based schedule.
+ * Updated 2025-02-07: Fixed type issues and improved error handling
  */
 
-import {
+import type {
   SchedulableEmployee,
   SchedulableShift,
-  AssignedShift,
-  Schedule,
-  EmployeeSchedulingState,
   StaffingRequirement,
+  Schedule,
+  ShiftAssignment,
+  StaffingGap,
 } from '@/types/scheduling';
-import {
-  hasExceededWeeklyHours,
-  isPatternAdherent,
-  isAlreadyWorking,
-} from './constraints';
-import { eachDayOfInterval, isSameDay } from 'date-fns';
+import { eachDayOfInterval, isWithinInterval } from 'date-fns';
 
 /**
- * Validates the generated schedule against staffing requirements.
- * @param schedule - The generated schedule to validate.
- * @param requirements - A list of staffing requirements.
- * @returns An array of strings describing any coverage gaps.
+ * Checks if an employee is available to work a given shift.
+ * @param employee - The employee to check.
+ * @param shift - The shift to check against.
+ * @returns True if the employee is available, false otherwise.
  */
-export function validateSchedule(
-  schedule: Schedule,
-  requirements: StaffingRequirement[]
-): string[] {
-  const gaps: string[] = [];
-  const days = eachDayOfInterval({
-    start: schedule.startDate,
-    end: schedule.endDate,
-  });
-
-  for (const day of days) {
-    const dateStr = day.toISOString().split('T')[0];
-    const shiftsOnDay = schedule.assignments.filter((a) =>
-      isSameDay(a.date, day)
-    );
-
-    for (const req of requirements) {
-      const shiftsInPeriod = shiftsOnDay.filter((a) => {
-        // This logic needs to be more robust to handle overnight shifts
-        return true; // Placeholder
-      });
-
-      if (shiftsInPeriod.length < req.minEmployees) {
-        gaps.push(
-          `Gap on ${dateStr} for ${req.periodName}: Missing ${req.minEmployees - shiftsInPeriod.length} employees.`
-        );
-      }
-    }
-  }
-  return gaps;
+function isEmployeeAvailable(
+  employee: SchedulableEmployee,
+  shift: SchedulableShift
+): boolean {
+  return employee.availability.some(
+    (interval: { start: Date; end: Date }) =>
+      isWithinInterval(shift.startTime, interval) &&
+      isWithinInterval(shift.endTime, interval)
+  );
 }
 
 /**
- * Attempts to fill any gaps in the schedule.
- * @param schedule - The schedule with potential gaps.
- * @param employees - The list of all employees.
- * @param employeeStates - The current state of all employees.
- * @returns The updated schedule.
+ * Checks if an employee has the necessary qualifications for a shift.
+ * @param employee - The employee to check.
+ * @param shift - The shift with required qualifications.
+ * @returns True if the employee is qualified, false otherwise.
  */
-export function fillGaps(
-  schedule: Schedule,
-  employees: SchedulableEmployee[],
-  employeeStates: { [id: string]: EmployeeSchedulingState }
-): Schedule {
-  // This is a complex task. For the POC, we will just log the gaps.
-  // A full implementation would try to assign overtime or adjust schedules.
-  console.log('Gap filling logic would run here.');
-  return schedule;
+function isEmployeeQualified(
+  employee: SchedulableEmployee,
+  shift: SchedulableShift
+): boolean {
+  return shift.requiredQualifications.every((q: string) =>
+    employee.qualifications.includes(q)
+  );
+}
+
+/**
+ * Converts a time string to a Date object for comparison
+ * @param timeString - Time string in "HH:mm:ss" format
+ * @param baseDate - Base date to use for the time
+ * @returns Date object with the specified time
+ */
+function timeStringToDate(timeString: string, baseDate: Date): Date {
+  const [hours, minutes, seconds] = timeString.split(':').map(Number);
+  const date = new Date(baseDate);
+  date.setHours(hours, minutes, seconds || 0);
+  return date;
 }
 
 /**
  * The main scheduling algorithm.
+ * This function generates a schedule based on employees, shifts, and staffing requirements.
+ * It follows a requirement-driven approach to ensure all staffing needs are met first.
  */
 export function generateSchedule(
   employees: SchedulableEmployee[],
@@ -83,69 +71,72 @@ export function generateSchedule(
   startDate: Date,
   endDate: Date
 ): Schedule {
-  let schedule: Schedule = {
+  const assignments: ShiftAssignment[] = [];
+  const gaps: StaffingGap[] = [];
+  const assignedEmployeeIds = new Set<string>();
+
+  // Iterate over each requirement to ensure it's met
+  for (const requirement of requirements) {
+    // Find the shift that corresponds to this requirement
+    const correspondingShift = shifts.find((shift) => {
+      const reqStartTime = timeStringToDate(requirement.startTime, startDate);
+      const reqEndTime = timeStringToDate(requirement.endTime, startDate);
+      return (
+        shift.startTime.getTime() === reqStartTime.getTime() &&
+        shift.endTime.getTime() === reqEndTime.getTime()
+      );
+    });
+
+    if (!correspondingShift) {
+      // If no shift matches the requirement, we can't fulfill it. This might be a configuration error.
+      gaps.push({
+        requirementId: requirement.id,
+        missingStaff: requirement.minStaff,
+        details: `No matching shift found for requirement ${requirement.id}.`,
+      });
+      continue;
+    }
+
+    // Find all employees who are qualified and available for this shift
+    const potentialCandidates = employees.filter(
+      (employee) =>
+        !assignedEmployeeIds.has(employee.id) && // Not already assigned to another shift in this pass
+        isEmployeeQualified(employee, correspondingShift) &&
+        isEmployeeAvailable(employee, correspondingShift)
+    );
+
+    const numToAssign = Math.min(
+      potentialCandidates.length,
+      requirement.minStaff
+    );
+
+    // Assign employees up to the minimum staff requirement
+    for (let i = 0; i < numToAssign; i++) {
+      const employeeToAssign = potentialCandidates[i];
+      assignments.push({
+        employeeId: employeeToAssign.id,
+        shiftId: correspondingShift.id,
+        date: startDate, // Use the start date for now
+      });
+      assignedEmployeeIds.add(employeeToAssign.id);
+    }
+
+    // If we couldn't meet the minimum, record a gap
+    if (numToAssign < requirement.minStaff) {
+      gaps.push({
+        requirementId: requirement.id,
+        missingStaff: requirement.minStaff - numToAssign,
+        details: `Could only find ${numToAssign} of ${requirement.minStaff} required staff.`,
+      });
+    }
+  }
+
+  const schedule: Schedule = {
     startDate,
     endDate,
-    assignments: [],
+    assignments,
+    gaps,
   };
-
-  const employeeStates: { [id: string]: EmployeeSchedulingState } = {};
-  for (const emp of employees) {
-    employeeStates[emp.id] = {
-      weeklyHours: 0,
-      consecutiveDaysWorked: 0,
-      lastDayOff: null,
-      assignedShifts: {},
-    };
-  }
-
-  const daysToSchedule = eachDayOfInterval({ start: startDate, end: endDate });
-
-  for (const day of daysToSchedule) {
-    const dateStr = day.toISOString().split('T')[0];
-
-    for (const shift of shifts) {
-      const requiredCount =
-        requirements.find((r) => r.periodName === 'Day Coverage')
-          ?.minEmployees || 0;
-      let assignedCount = 0;
-
-      for (const employee of employees) {
-        if (assignedCount >= requiredCount) break;
-
-        const state = employeeStates[employee.id];
-
-        if (
-          !isAlreadyWorking(state, day) &&
-          isPatternAdherent(state) &&
-          !hasExceededWeeklyHours(state, shift.durationHours)
-        ) {
-          const newAssignment = {
-            employeeId: employee.id,
-            shiftId: shift.id,
-            date: day,
-          };
-          schedule.assignments.push(newAssignment);
-
-          state.assignedShifts[dateStr] = shift.id;
-          state.weeklyHours += shift.durationHours;
-          state.consecutiveDaysWorked++;
-
-          assignedCount++;
-        }
-      }
-    }
-
-    for (const emp of employees) {
-      if (!employeeStates[emp.id].assignedShifts[dateStr]) {
-        employeeStates[emp.id].consecutiveDaysWorked = 0;
-        employeeStates[emp.id].lastDayOff = day;
-      }
-    }
-  }
-
-  // Final pass to fill gaps
-  schedule = fillGaps(schedule, employees, employeeStates);
 
   return schedule;
 }

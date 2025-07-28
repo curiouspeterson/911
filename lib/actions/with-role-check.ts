@@ -23,11 +23,11 @@ type ServerAction<T extends any[]> = (...args: T) => Promise<ActionResponse>;
  *   return { success: true, data: 'Admin task complete!' };
  * });
  */
-export async function withRoleCheck<T extends any[]>(
+export function withRoleCheck<T extends any[]>(
   requiredRoles: string[],
   action: ServerAction<T>
-): Promise<ServerAction<T>> {
-  return (async (...args: T): Promise<ActionResponse> => {
+): ServerAction<T> {
+  return async (...args: T): Promise<ActionResponse> => {
     const hasPermission = await userHasRole(requiredRoles);
 
     if (!hasPermission) {
@@ -42,5 +42,5 @@ export async function withRoleCheck<T extends any[]>(
     }
 
     return action(...args);
-  }) as ServerAction<T>;
+  };
 }
