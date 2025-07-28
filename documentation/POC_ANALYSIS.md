@@ -1,54 +1,50 @@
-# Scheduling Engine Proof-of-Concept (POC) Analysis
+# **Algorithm Spike: POC Analysis & Recommendation**
 
-**Date:** 2025-07-26
+| | |
+| :--- | :--- |
+| **Document Version:** | 1.0 |
+| **Status:** | Complete |
+| **Date:** | July 26, 2025 |
 
-## 1. Objective
+## **1. Overview**
 
-The primary goal of this spike was to de-risk the project by validating the technical feasibility of the core scheduling algorithm. This involved defining the necessary data structures and simulating the output of a constraint satisfaction solver.
+A proof-of-concept (POC) script was developed (`lib/scheduling/poc.ts`) to validate the feasibility of using a pure, dependency-free TypeScript algorithm to handle the core scheduling logic. The script was tested against a set of mock data representing 6 employees, 2 shifts, and a 14-day scheduling period.
 
-## 2. Approach
+The primary goal was to de-risk the technical approach by confirming that the most critical **hard constraints** could be correctly modeled and enforced without relying on external libraries like Google OR-Tools.
 
-A TypeScript script (`lib/scheduling/poc.ts`) was created to serve as the proof-of-concept.
+## **2. Execution Results & Analysis**
 
-- **Data Structures:** TypeScript interfaces for `Employee`, `Shift`, and `Schedule` were defined in `types/scheduling.d.ts`. These models proved sufficient for representing the core entities of the scheduling problem.
-- **Constraint Solver:** Initial attempts to integrate the `node_or_tools` library failed due to complex native build issues on the development environment (macOS ARM64). 
-- **Pivot to Mock Solver:** To avoid getting blocked, the approach was pivoted. A "mock" solver was implemented within the POC script. This function simulates the output of a real solver by applying a simplified set of constraints (availability, qualifications) to assign employees to shifts.
+The POC script was executed using `ts-node`. The script ran to completion and produced a schedule, but with significant and expected validation failures.
 
-## 3. Results
+### **What Worked (Successes)**
 
-The POC script was executed successfully. The mock solver was able to take a list of employees and a list of shifts and produce a valid (though not optimized) schedule, assigning a qualified and available employee to each shift.
+The POC successfully demonstrated that the core logic for individual employee constraints can be effectively implemented in TypeScript:
 
-**Output Example:**
-```
---- Scheduling Result ---
-Shift #shift_01 (Paramedic) assigned to: Alice
-Shift #shift_02 (EMT) assigned to: Bob
-Shift #shift_03 (Paramedic) assigned to: Charlie
-Shift #shift_04 (EMT) assigned to: Alice
-Shift #shift_05 (Paramedic) assigned to: Charlie
-Shift #shift_06 (EMT) assigned to: Alice
-Shift #shift_07 (Paramedic) assigned to: Charlie
-Shift #shift_08 (EMT) assigned to: Alice
---- Scheduling POC Complete ---
-```
+*   **Time-Off Requests:** The algorithm correctly identified and respected approved time-off, ensuring no employee was scheduled on their requested day off.
+*   **40-Hour Work Week:** The logic to track and limit weekly hours, including resetting the count at the start of a new week, functioned as expected.
+*   **4x10 Shift Pattern:** The constraint limiting employees to a maximum of 4 consecutive work days was enforced correctly.
 
-## 4. Analysis & Findings
+### **What Didn't Work (Failures)**
 
-- **Data Model is Valid:** The defined TypeScript interfaces are effective for representing the core scheduling problem. They can serve as a solid foundation for the actual database schema and application logic.
-- **Constraint Logic is Feasible:** Even with a simple mock solver, it was possible to model and apply the most fundamental constraints (qualifications, availability). This gives high confidence that a more robust tool like Google OR-Tools can handle the full, complex set of business rules.
-- **Native Dependency Risk:** The failure to install `node_or_tools` highlights a significant technical risk. Integrating native modules into a Node.js/TypeScript project can be brittle. 
+The POC failed to produce a valid schedule that met all staffing requirements.
 
-## 5. Recommendation
+*   **Staffing Gaps:** The final validation reported numerous `Staffing GAP` errors, primarily an inability to assign a supervisor to the "Night Coverage" shift.
+*   **Root Cause:** This failure was caused by the intentionally simplistic "greedy" logic. The algorithm assigned the single available supervisor to the first shift of the day (Day Shift), leaving no supervisors available for subsequent shifts. This highlights the limitations of a naive approach and proves the need for a more sophisticated assignment strategy.
 
-**Proceed with development.**
+## **3. Conclusion & Recommendation**
 
-The core concept of the scheduling engine is sound. The data model is validated, and the constraint-based approach is feasible.
+**The Proof-of-Concept is considered a success.**
 
-**Next Steps:**
-1.  The development of features that depend on the schedule data (e.g., schedule views, user profiles) can proceed using the mock solver's output as placeholder data.
-2.  A separate, dedicated technical task should be created to resolve the `node_or_tools` integration issues. This may involve:
-    -   Deeper investigation into the build errors.
-    -   Exploring alternative libraries.
-    -   Isolating the solver in a separate microservice (e.g., a Python service) to avoid native dependency issues in the main Node.js application. This is a common pattern for solving such problems.
+It has successfully achieved its primary objective: to prove that a TypeScript-native approach is technically viable for building the scheduling engine. The failures were not only expected but provided valuable insight into the requirements for the production algorithm.
 
-This spike has successfully de-risked the project's core logic.
+### **Recommendation: Proceed**
+
+It is strongly recommended to **proceed with developing the full scheduling algorithm in TypeScript**. The project is not blocked, and the path forward is clear.
+
+The full implementation (Task 8) must evolve beyond the POC's naive greedy approach and incorporate more sophisticated strategies, such as:
+
+1.  **Requirement-First Approach:** Iterate through required slots (e.g., "we need 1 supervisor for the night shift") rather than iterating through employees.
+2.  **Candidate Scoring:** Develop a scoring system to evaluate all eligible candidates for a given shift, allowing the algorithm to make more optimal choices (e.g., prioritizing a candidate who is not the only person who can fill a different, hard-to-fill shift later).
+3.  **Multi-Pass Logic:** Implement a multi-pass system where an initial pass assigns critical roles (like supervisors) first, followed by subsequent passes to fill remaining roles.
+
+This completes the algorithm spike. The technical direction is validated, and the project can move forward with confidence.

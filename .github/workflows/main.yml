@@ -29,9 +29,7 @@ jobs:
         run: npm run lint
 
       - name: Run tests
-        # Add a test script to package.json first
-        # run: npm test
-        run: echo "No tests configured yet."
+        run: npm test
 
       - name: Build project
         run: npm run build
@@ -44,13 +42,8 @@ jobs:
 
     steps:
       - name: Deploy to Vercel
-        run: echo "Deployment to Vercel would happen here."
-        # This step would typically use the Vercel CLI or a GitHub Action
-        # and require secrets for authentication.
-        # Example:
-        # - name: Deploy to Vercel
-        #   uses: amondnet/vercel-action@v20
-        #   with:
-        #     vercel-token: ${{ secrets.VERCEL_TOKEN }}
-        #     vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-        #     vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}

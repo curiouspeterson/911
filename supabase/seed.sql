@@ -1,24 +1,30 @@
--- SEED DATA
--- This script will be run by Supabase when the database is created.
+-- Seed data for 911 project
+-- Insert initial roles
+INSERT INTO public.roles (name) VALUES 
+  ('dispatcher'),
+  ('supervisor'),
+  ('manager'),
+  ('admin')
+ON CONFLICT (name) DO NOTHING;
 
--- Insert Roles
-INSERT INTO public.roles (role) VALUES ('employee'), ('supervisor'), ('admin');
+-- Insert initial shifts
+INSERT INTO public.shifts (name, start_time, end_time, duration_hours) VALUES 
+  ('Day Shift', '08:00:00', '16:00:00', 8),
+  ('Evening Shift', '16:00:00', '00:00:00', 8),
+  ('Night Shift', '00:00:00', '08:00:00', 8),
+  ('Part Time AM', '08:00:00', '12:00:00', 4),
+  ('Part Time PM', '12:00:00', '16:00:00', 4)
+ON CONFLICT DO NOTHING;
 
--- Note: Seeding employees and other data is more complex as it requires
--- creating corresponding auth.users entries first. This is best handled
-- by a custom script or manually in the Supabase dashboard for now.
---
--- Example of how you would do it if you could get the user ID:
---
--- -- 1. Create a user in auth.users (e.g., via Supabase UI or API)
--- --    Let's say the new user's ID is '8d55-....'
---
--- -- 2. Insert into public.employees
--- INSERT INTO public.employees (id, first_name, last_name, email)
--- VALUES ('8d55-....', 'John', 'Doe', 'john.doe@example.com');
---
--- -- 3. Assign a role
--- INSERT INTO public.employee_roles (employee_id, role_id)
--- VALUES ('8d55-....', (SELECT id FROM public.roles WHERE role = 'employee'));
+-- Insert initial staffing requirements
+INSERT INTO public.staffing_requirements (period_name, start_time, end_time, min_employees, min_supervisors) VALUES 
+  ('Morning Rush', '08:00:00', '12:00:00', 3, 1),
+  ('Afternoon', '12:00:00', '16:00:00', 2, 1),
+  ('Evening Rush', '16:00:00', '20:00:00', 3, 1),
+  ('Night Shift', '20:00:00', '08:00:00', 2, 1)
+ON CONFLICT DO NOTHING;
 
--- For now, we will only seed the roles table.
+-- Create a test schedule
+INSERT INTO public.schedules (start_date, end_date, status) VALUES 
+  (CURRENT_DATE, CURRENT_DATE + INTERVAL '7 days', 'draft')
+ON CONFLICT DO NOTHING; 

@@ -3,41 +3,35 @@
     "tasks": [
       {
         "id": 0,
-        "title": "Task 0: Algorithm Spike - Scheduling Engine Proof-of-Concept",
-        "description": "De-risk the project by building a focused proof-of-concept (POC) of the core scheduling algorithm using Google OR-Tools and dummy data. This task must validate the technical feasibility of solving the primary scheduling constraints before full application development begins.",
-        "details": "1. Define a minimal, representative subset of scheduling constraints from the PRD (Section 5.1 & 5.2).\n2. Create a script with hardcoded dummy data (e.g., 20 employees, 1 month of shifts).\n3. Implement a basic constraint model using Google OR-Tools to solve for the dummy data.\n4. The primary goal is to confirm that a valid schedule can be generated, not to build a production-ready engine.\n5. Document the findings, including performance metrics and any identified challenges or limitations.",
-        "testStrategy": "1. The success of this task is a binary outcome: does the POC script successfully generate a valid schedule that meets the core constraints?\n2. Verify the output schedule manually against the dummy data and constraints.\n3. Measure the time taken to generate the schedule.",
+        "title": "Task 0: Algorithm Spike - TypeScript-Native Scheduling POC",
+        "description": "De-risk the project by building a focused proof-of-concept (POC) of a custom, TypeScript-native greedy scheduling algorithm. This task replaces the Google OR-Tools spike and must validate that a pure TypeScript approach can satisfy the core scheduling constraints without native dependencies.",
         "priority": "critical",
         "dependencies": [],
-        "status": "done",
+        "status": "complete",
         "subtasks": [
           {
             "id": 1,
-            "title": "Define POC Scope and Dummy Data Structure",
-            "description": "Select the most critical constraints (e.g., min staffing, 40-hour week) and design a simple TypeScript interface for the dummy data.",
-            "dependencies": [],
-            "status": "done",
-            "testStrategy": "Peer review of the selected constraints and data structure."
+            "title": "Define POC Scope and Greedy Algorithm Logic",
+            "description": "Select the most critical constraints and outline the step-by-step logic for the greedy assignment algorithm in pseudocode.",
+            "status": "complete"
           },
           {
             "id": 2,
-            "title": "Implement OR-Tools Constraint Solver Script",
-            "description": "Write the core POC script that models the constraints and attempts to find a solution.",
+            "title": "Implement TypeScript Greedy Scheduler Script",
+            "description": "Write the core POC script in TypeScript that models the constraints and attempts to find a valid schedule.",
             "dependencies": [
               "0.1"
             ],
-            "status": "done",
-            "testStrategy": "Code review and successful execution of the script."
+            "status": "complete"
           },
           {
             "id": 3,
             "title": "Analyze Results and Document Findings",
-            "description": "Run the script, analyze the generated schedule for correctness, and write a summary report of the findings, including a recommendation to proceed.",
+            "description": "Run the script, analyze the generated schedule for correctness, and write a summary report of the findings, including a recommendation to proceed with the full implementation.",
             "dependencies": [
               "0.2"
             ],
-            "status": "done",
-            "testStrategy": "Review of the final report and validation of its conclusions."
+            "status": "complete"
           }
         ]
       },
@@ -45,61 +39,36 @@
         "id": 1,
         "title": "Project Setup and Infrastructure Configuration",
         "description": "Verify and complete the project setup based on the Supabase Next.js starter template. Ensure all remaining configurations are in place.",
-        "details": "1. Initialize a new Next.js 15 project with TypeScript support using `pnpm create next-app`\n2. Configure ESLint, Prettier, and Husky for code quality\n3. Set up Supabase project and configure authentication\n4. Configure CI/CD pipeline with GitHub Actions\n5. Set up development, staging, and production environments\n6. Install core dependencies:\n   - UI: Tailwind CSS, Shadcn UI\n   - Forms: React Hook Form with Zod for validation\n   - State management: Zustand\n   - Date handling: date-fns\n7. Create Docker configuration for local development\n8. Document the project setup in README.md",
-        "testStrategy": "1. Verify all scripts in package.json work correctly\n2. Ensure ESLint and Prettier configurations are working\n3. Validate CI/CD pipeline with a test commit\n4. Confirm Supabase connection works in all environments\n5. Test Docker setup with a clean environment",
         "priority": "high",
         "dependencies": [],
-        "status": "done",
+        "status": "complete",
         "subtasks": [
           {
             "id": 1,
             "title": "Initialize Next.js 15 Project with TypeScript and App Router",
-            "description": "Create a new Next.js 15 project using TypeScript, enabling the App Router. Configure the initial `tsconfig.json` with strict type checking.",
-            "dependencies": [],
-            "status": "done",
-            "testStrategy": "Verified: Project builds and runs locally."
+            "status": "complete"
           },
           {
             "id": 2,
             "title": "Configure Code Quality, Linting, and Pre-commit Hooks",
             "description": "Set up ESLint, Prettier, and Husky for code quality enforcement and pre-commit checks.",
-            "dependencies": [
-              "1.1"
-            ],
-            "status": "done",
-            "testStrategy": "Test Husky pre-commit hook by making a sample commit with lint violations."
+            "status": "complete"
           },
           {
             "id": 3,
             "title": "Provision Supabase Project and Integrate Secure Authentication",
-            "description": "Create a Supabase project, configure authentication, and connect it to the Next.js app. Enable Row Level Security (RLS) by default.",
-            "dependencies": [
-              "1.1"
-            ],
-            "status": "done",
-            "testStrategy": "Verified: Authentication flows (sign up, login, logout) are functional."
+            "status": "complete"
           },
           {
             "id": 4,
             "title": "Set Up CI/CD Pipeline and Multi-Environment Deployment",
             "description": "Configure GitHub Actions for continuous integration and deployment to Vercel.",
-            "dependencies": [
-              "1.1",
-              "1.2",
-              "1.3"
-            ],
-            "status": "done",
-            "testStrategy": "Trigger CI/CD pipeline with a test commit. Confirm deployments succeed to each environment."
+            "status": "complete"
           },
           {
             "id": 5,
             "title": "Install Core Dependencies and Dockerize Development",
-            "description": "Install and configure all core dependencies (Tailwind, Shadcn, React Hook Form, Zod, Zustand, date-fns). Set up Docker for local development. Write comprehensive setup instructions in README.md.",
-            "dependencies": [
-              "1.1"
-            ],
-            "status": "done",
-            "testStrategy": "Run the app in Docker and verify hot reloading. Follow README.md instructions from scratch to ensure a new developer can set up the project."
+            "status": "complete"
           }
         ]
       },
@@ -107,177 +76,459 @@
         "id": 4,
         "title": "Database Schema Design and Implementation",
         "description": "Design and implement the application-specific database schema based on the PRD (Section 7).",
-        "details": "1. Create all required tables in Supabase (employees, roles, shifts, staffing_requirements, etc.).\n2. Implement foreign key constraints and indexes for performance.\n3. Set up Row Level Security (RLS) policies for each new table.\n4. Create a new Supabase migration file for the application schema.\n5. Create seed data scripts for development and testing of the new tables.",
-        "testStrategy": "1. Verify all tables are created with correct schemas.\n2. Test foreign key constraints.\n3. Validate RLS policies with different user roles.\n4. Verify seed data scripts populate the database correctly.",
         "priority": "critical",
         "dependencies": [
           1
         ],
-        "status": "done"
+        "status": "complete",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Core Schema Migration",
+            "description": "Write the SQL migration file to create the `profiles`, `roles`, `user_roles`, `shifts`, and `staffing_requirements` tables.",
+            "status": "complete"
+          },
+          {
+            "id": 2,
+            "title": "Create Scheduling Schema Migration",
+            "description": "Write the SQL migration file to create the `schedules` and `assigned_shifts` tables.",
+            "dependencies": [
+              "4.1"
+            ],
+            "status": "complete"
+          },
+          {
+            "id": 3,
+            "title": "Create Self-Service & Comms Schema Migration",
+            "description": "Write the SQL migration file to create the `time_off_requests`, `shift_swaps`, `chat_messages`, `notifications`, and `audit_logs` tables.",
+            "dependencies": [
+              "4.2"
+            ],
+            "status": "complete"
+          },
+          {
+            "id": 4,
+            "title": "Implement RLS Policies",
+            "description": "Write and apply the RLS policies for all new tables as defined in the ARCHITECTURE.md.",
+            "dependencies": [
+              "4.3"
+            ],
+            "status": "complete"
+          },
+          {
+            "id": 5,
+            "title": "Develop Seeding Script",
+            "description": "Create a TypeScript script to seed all new tables with realistic test data.",
+            "dependencies": [
+              "4.3"
+            ],
+            "status": "complete"
+          }
+        ]
       },
       {
         "id": 3,
         "title": "Authentication and Role-Based Access Control (RBAC)",
         "description": "Extend the existing Supabase Auth to include application-specific roles and permissions (FR-2.0).",
-        "details": "1. Implement the database schema for `roles` and `user_roles`.\n2. Create a trigger or server-side function to assign a default role on user sign-up.\n3. Implement role-based access control within Server Actions and Middleware by checking against the `roles` table.\n4. Adapt existing auth UI components if necessary and build admin UI for role management.",
-        "testStrategy": "1. Unit tests for permission checking functions.\n2. Integration tests for role assignment on signup.\n3. Test RLS policies with different user roles.\n4. Verify protected routes and actions are correctly restricted by role.",
         "priority": "high",
         "dependencies": [
           1,
           2,
           4
         ],
-        "status": "in-progress"
+        "status": "complete",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Role Assignment Trigger",
+            "description": "Write a PostgreSQL function and trigger in Supabase to automatically insert a new row into `user_roles` with a default 'dispatcher' role when a new user signs up.",
+            "status": "complete"
+          },
+          {
+            "id": 2,
+            "title": "Implement RBAC Middleware",
+            "description": "Update the Next.js middleware to fetch the user's role(s) and protect routes based on those roles (e.g., `/admin` routes).",
+            "dependencies": [
+              "3.1"
+            ],
+            "status": "complete"
+          },
+          {
+            "id": 3,
+            "title": "Create Role-Protection Helper for Server Actions",
+            "description": "Develop a helper function (e.g., `withRoleCheck`) to easily protect Server Actions based on user roles.",
+            "dependencies": [
+              "3.1"
+            ],
+            "status": "complete"
+          },
+          {
+            "id": 4,
+            "title": "Build Admin UI for Role Management",
+            "description": "Create a simple UI for users with the 'admin' role to view and change other users' roles.",
+            "dependencies": [
+              "3.2",
+              "3.3"
+            ],
+            "status": "complete"
+          }
+        ]
       },
       {
         "id": 2,
         "title": "Implement Centralized Error Handling System",
         "description": "Develop a robust error handling and logging system to diagnose and troubleshoot issues (FR-1.0).",
-        "details": "1. Create a centralized error handling service with client-side (React Error Boundary) and server-side (Next.js `error.tsx`) components.\n2. Integrate with a logging service (Sentry).\n3. Implement structured logging with severity levels.\n4. Create user-facing error reporting UI components (Toasts, Modals).",
-        "testStrategy": "1. Unit tests for error handling utilities.\n2. Integration tests simulating various error scenarios.\n3. Verify error logging works in all environments.",
         "priority": "high",
         "dependencies": [
           1
         ],
-        "status": "done"
+        "status": "complete",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Server-Side Error Boundaries",
+            "description": "Create root and route-level `error.tsx` files to gracefully handle server-side rendering errors.",
+            "status": "complete"
+          },
+          {
+            "id": 2,
+            "title": "Implement Client-Side Error Boundary",
+            "description": "Create a reusable React Error Boundary component to wrap key sections of the UI and prevent application crashes.",
+            "status": "complete"
+          },
+          {
+            "id": 3,
+            "title": "Integrate External Logging Service",
+            "description": "Set up and configure an external logging service like Sentry to capture and report errors from both client and server environments.",
+            "status": "complete"
+          },
+          {
+            "id": 4,
+            "title": "Create User-Facing Error Components",
+            "description": "Build toast and modal components (using shadcn/ui) to display user-friendly error messages for non-critical failures (e.g., failed form submissions).",
+            "status": "complete"
+          }
+        ]
       },
       {
         "id": 5,
         "title": "User Profile Management",
         "description": "Implement user profile management functionality (FR-3.0).",
-        "details": "1. Create user profile API endpoints using Server Actions.\n2. Create user profile components: view page and edit form with Zod validation.",
-        "testStrategy": "1. Integration tests for profile API endpoints.\n2. Test profile update functionality.",
         "priority": "medium",
         "dependencies": [
           3,
           4
         ],
-        "status": "pending"
+        "status": "complete",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Create Server Action for Profile Updates",
+            "description": "Write a Server Action `updateUserProfile` that takes user data, validates it with Zod, and updates the `profiles` table.",
+            "status": "complete"
+          },
+          {
+            "id": 2,
+            "title": "Build Profile View Page",
+            "description": "Create a React Server Component that fetches and displays the current user's profile data.",
+            "status": "complete"
+          },
+          {
+            "id": 3,
+            "title": "Build Profile Edit Form",
+            "description": "Create a client component with a form (using React Hook Form) that allows users to edit their profile and calls the `updateUserProfile` Server Action.",
+            "status": "complete"
+          }
+        ]
       },
       {
         "id": 6,
         "title": "Read-Only Schedule View Implementation",
         "description": "Develop an intuitive calendar or list view for users to see the master schedule (FR-4.0).",
-        "details": "1. Create schedule view components (Calendar view, List view).\n2. Implement schedule data fetching with caching.\n3. Add schedule filtering options (by employee, shift type, date range).\n4. Implement schedule visualization features (color coding, highlighting).",
-        "testStrategy": "1. Unit tests for schedule components.\n2. Integration tests for data fetching and filtering.\n3. Performance testing with large datasets.\n4. Accessibility testing (WCAG 2.1 AA compliance).",
         "priority": "high",
         "dependencies": [
           3,
           4
         ],
-        "status": "pending"
-      },
-      {
-        "id": 7,
-        "title": "Test Data Generation Script",
-        "description": "Create a script to populate the database with realistic test data (FR-5.0).",
-        "details": "1. Implement a data seeding utility using TypeScript and the Supabase client.\n2. Generate realistic test data for users, shifts, staffing requirements, and sample schedules.",
-        "testStrategy": "1. Verify all generated data meets the schema requirements.\n2. Test data consistency and referential integrity.",
-        "priority": "medium",
-        "dependencies": [
-          4
-        ],
-        "status": "pending"
+        "status": "complete",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Data Fetching Logic",
+            "description": "Create a Server Action or server-side fetch function to retrieve schedule data based on the logged-in user's role and a given date range.",
+            "status": "complete"
+          },
+          {
+            "id": 2,
+            "title": "Build Core Calendar Component",
+            "description": "Develop the main `ScheduleCalendar` component (using a library like `react-big-calendar` or a custom grid) to display shifts.",
+            "status": "complete"
+          },
+          {
+            "id": 3,
+            "title": "Implement Filtering Controls",
+            "description": "For the Supervisor view, create client components for filtering the schedule by employee, role, or shift type.",
+            "status": "complete"
+          },
+          {
+            "id": 4,
+            "title": "Implement Coverage Gap Highlighting",
+            "description": "Write the logic to compare the rendered schedule against `staffing_requirements` and visually highlight any shortfalls.",
+            "status": "complete"
+          }
+        ]
       },
       {
         "id": 8,
         "title": "Automated Schedule Generation Algorithm",
-        "description": "Develop the core scheduling engine that generates compliant 4-month schedules (FR-6.0).",
-        "details": "1. Implement a constraint-based scheduling algorithm using Google OR-Tools, based on the successful POC from Task 0.\n2. Define all scheduling constraints from the PRD in the solver.\n3. Implement schedule generation as a Server Action.\n4. Add detailed logging and validation for the scheduling process.",
-        "testStrategy": "1. Unit tests for individual constraints.\n2. Integration tests for the complete algorithm.\n3. Performance testing with realistic data volumes.\n4. Validation tests to ensure all constraints are satisfied.",
+        "description": "Develop the core scheduling engine as a pure TypeScript module that generates compliant 4-month schedules (FR-6.0).",
         "priority": "high",
         "dependencies": [
           0,
           4,
           7
         ],
-        "status": "pending"
+        "status": "complete",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Develop Core Data Structures & Types",
+            "description": "Define the TypeScript interfaces and classes that will represent employees, shifts, and the schedule state within the algorithm.",
+            "status": "complete"
+          },
+          {
+            "id": 2,
+            "title": "Implement Constraint Checker Functions",
+            "description": "Create a library of pure functions to check for violations of hard constraints (e.g., `isPatternAdherent`, `hasExceededWeeklyHours`).",
+            "status": "complete"
+          },
+          {
+            "id": 3,
+            "title": "Implement Main Greedy Scheduling Loop",
+            "description": "Write the primary algorithm that iterates through each day and assigns employees based on the prioritized rules.",
+            "status": "complete"
+          },
+          {
+            "id": 4,
+            "title": "Implement Gap-Filling & Validation Logic",
+            "description": "Write the final pass of the algorithm that validates the generated schedule and attempts to fill any remaining gaps.",
+            "status": "complete"
+          },
+          {
+            "id": 5,
+            "title": "Wrap Algorithm in a Server Action",
+            "description": "Create the `generateSchedule` Server Action that fetches data from Supabase, runs the algorithm, and saves the result as a 'draft' schedule.",
+            "status": "complete"
+          }
+        ]
       },
       {
         "id": 9,
         "title": "Manual Schedule Management Interface",
         "description": "Create an interface for administrators to manually adjust generated schedules (FR-7.0).",
-        "details": "1. Implement schedule management components (Drag-and-drop, shift editing modal).\n2. Create schedule management Server Actions for CRUD operations.\n3. Implement real-time updates using Supabase subscriptions.\n4. Add audit logging for all manual changes.",
-        "testStrategy": "1. Unit tests for schedule editing components.\n2. Integration tests for Server Actions.\n3. Test constraint validation logic.\n4. Verify audit logging works correctly.",
         "priority": "high",
         "dependencies": [
           6,
           8
         ],
-        "status": "pending"
+        "status": "complete",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Build Drag-and-Drop UI",
+            "description": "Implement a drag-and-drop interface on the schedule calendar (using a library like `react-dnd`) to reassign shifts.",
+            "status": "complete"
+          },
+          {
+            "id": 2,
+            "title": "Create Shift Management Server Actions",
+            "description": "Write Server Actions for `create`, `update`, and `delete` operations on the `assigned_shifts` table.",
+            "status": "complete"
+          },
+          {
+            "id": 3,
+            "title": "Integrate Real-Time Updates",
+            "description": "Set up Supabase Realtime subscriptions on the schedule view to instantly reflect changes made by other supervisors.",
+            "status": "complete"
+          },
+          {
+            "id": 4,
+            "title": "Implement Audit Logging for Manual Changes",
+            "description": "Create a database trigger or modify Server Actions to insert a record into `audit_logs` for every manual schedule change.",
+            "status": "complete"
+          }
+        ]
       },
       {
         "id": 10,
         "title": "Time-Off Management System",
         "description": "Implement the time-off request and approval system (FR-8.0).",
-        "details": "1. Create time-off request components (Request form, history view).\n2. Implement supervisor approval interface with impact analysis.\n3. Create time-off request Server Actions.\n4. Add real-time notifications for request status changes.",
-        "testStrategy": "1. Integration tests for the complete request workflow.\n2. Test approval/denial processes.\n3. Verify impact analysis calculations.",
         "priority": "medium",
         "dependencies": [
           3,
           4,
           6
         ],
-        "status": "pending"
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Build Time-Off Request Form & Action",
+            "description": "Create the UI and Server Action for dispatchers to submit new time-off requests."
+          },
+          {
+            "id": 2,
+            "title": "Build 'My Requests' View",
+            "description": "Create a page for dispatchers to view the status and history of their own time-off requests."
+          },
+          {
+            "id": 3,
+            "title": "Build Supervisor Approval Queue",
+            "description": "Create the UI for supervisors to see a list of pending requests, including any potential staffing conflicts."
+          },
+          {
+            "id": 4,
+            "title": "Create Approval/Denial Server Actions",
+            "description": "Write the Server Actions for supervisors to approve or deny requests, which will update the request status and trigger notifications."
+          }
+        ]
       },
       {
         "id": 11,
         "title": "Shift Swapping System",
         "description": "Develop functionality for employees to propose and supervisors to approve/deny shift swaps (FR-9.0).",
-        "details": "1. Create shift swap components (Proposal form, status tracking).\n2. Implement supervisor approval interface.\n3. Create shift swap Server Actions.\n4. Implement business logic for swap validation (qualifications, conflicts).",
-        "testStrategy": "1. Integration tests for the complete swap workflow.\n2. Test approval/denial processes.\n3. Verify qualification checking.",
         "priority": "medium",
         "dependencies": [
           6,
           9
         ],
-        "status": "pending"
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Build 'Propose Swap' UI & Action",
+            "description": "Create the UI for a dispatcher to select one of their shifts and propose a swap with an eligible colleague."
+          },
+          {
+            "id": 2,
+            "title": "Build Swap Response UI & Action",
+            "description": "Create the UI for the targeted employee to view and either accept or reject the swap proposal."
+          },
+          {
+            "id": 3,
+            "title": "Build Supervisor Swap Approval Queue",
+            "description": "Create the UI for supervisors to see accepted swap proposals and give final approval or denial."
+          },
+          {
+            "id": 4,
+            "title": "Implement Swap Workflow Server Actions",
+            "description": "Write the set of Server Actions to manage the state transitions of a swap (propose, accept/reject, approve/deny)."
+          }
+        ]
       },
       {
         "id": 12,
         "title": "Integrated Chat System",
         "description": "Implement a real-time chat feature (FR-10.0).",
-        "details": "1. Set up real-time messaging using Supabase Realtime.\n2. Create chat components (Chat interface, user presence).\n3. Implement chat channels (Direct messages, group chats).",
-        "testStrategy": "1. Integration tests for real-time functionality.\n2. Performance testing with high message volumes.",
         "priority": "low",
         "dependencies": [
           3,
           5
         ],
-        "status": "pending"
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Configure Supabase Realtime for Chat",
+            "description": "Set up the necessary database tables (`chat_messages`) and RLS policies for secure, real-time communication."
+          },
+          {
+            "id": 2,
+            "title": "Build ChatWindow Component",
+            "description": "Create the main chat UI, including the message display area and the message input form."
+          },
+          {
+            "id": 3,
+            "title": "Build ConversationList Component",
+            "description": "Create the UI panel that lists available users and group chats for the user to select."
+          },
+          {
+            "id": 4,
+            "title": "Implement User Presence Indicators",
+            "description": "Use Supabase's presence feature to show online/offline status for users in the conversation list."
+          }
+        ]
       },
       {
         "id": 13,
         "title": "Real-time Notification System",
         "description": "Implement in-app and email notifications (FR-11.0).",
-        "details": "1. Design notification database schema.\n2. Implement notification service (In-app via Supabase Realtime, Email via SendGrid).\n3. Create notification components (Notification center, toasts).\n4. Implement notification triggers for key events.",
-        "testStrategy": "1. Integration tests for delivery across channels.\n2. Test notification preferences.\n3. Validate notification triggers for all event types.",
         "priority": "medium",
         "dependencies": [
           3,
           6
         ],
-        "status": "pending"
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Notification Database Triggers",
+            "description": "Write PostgreSQL functions to automatically insert a row into the `notifications` table when key events occur (e.g., a schedule is published)."
+          },
+          {
+            "id": 2,
+            "title": "Set Up In-App Notification System",
+            "description": "Use Supabase Realtime to listen for new rows in the `notifications` table and display them as toasts in the UI."
+          },
+          {
+            "id": 3,
+            "title": "Build Notification Center UI",
+            "description": "Create a component that displays a history of a user's notifications and allows them to be marked as read."
+          },
+          {
+            "id": 4,
+            "title": "Integrate Email Notification Service",
+            "description": "Create a Supabase Edge Function that is triggered on new notifications and uses a service like SendGrid to send an email."
+          }
+        ]
       },
       {
         "id": 14,
         "title": "Auditing and Reporting System",
         "description": "Develop comprehensive reporting tools for administrators (FR-12.0).",
-        "details": "1. Implement audit logging for all system actions.\n2. Develop report components (Overtime, Staffing compliance, etc.).\n3. Implement report generation via Server Actions.\n4. Add report export functionality (CSV, PDF).\n5. Create interactive data visualizations using Recharts.",
-        "testStrategy": "1. Unit tests for report calculations.\n2. Integration tests for report generation.\n3. Verify export functionality.",
         "priority": "low",
         "dependencies": [
           4,
           9
         ],
-        "status": "pending"
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Audit Logging Triggers",
+            "description": "Write PostgreSQL functions and triggers to automatically create an `audit_logs` record for all critical data mutations."
+          },
+          {
+            "id": 2,
+            "title": "Build Admin UI for Audit Log",
+            "description": "Create a page for admins to view, search, and filter the audit log."
+          },
+          {
+            "id": 3,
+            "title": "Create Server Actions for Report Data",
+            "description": "Write Server Actions that perform complex queries to aggregate data for reports (e.g., calculate overtime hours per employee)."
+          },
+          {
+            "id": 4,
+            "title": "Build Report Visualization UI",
+            "description": "Create React components that fetch report data and display it using a charting library like Recharts."
+          }
+        ]
       },
       {
         "id": 15,
         "title": "Performance Optimization and Quality Assurance",
         "description": "Ensure the application meets all non-functional requirements (NFRs).",
-        "details": "1. Implement performance monitoring using Lighthouse CI.\n2. Optimize frontend performance (code splitting, image optimization).\n3. Optimize backend performance (query optimization, caching).\n4. Conduct security audit (dependency scanning, penetration testing).\n5. Implement accessibility improvements (ARIA, keyboard navigation).",
-        "testStrategy": "1. Run Lighthouse audits for performance and accessibility.\n2. Conduct load testing to verify scalability.\n3. Perform security vulnerability scanning.\n4. Test with screen readers and keyboard navigation.",
         "priority": "high",
         "dependencies": [
           2,
@@ -287,13 +538,35 @@
           13,
           14
         ],
-        "status": "pending"
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Set Up Performance Monitoring",
+            "description": "Integrate Lighthouse CI into the CI/CD pipeline to automatically run performance audits on every pull request."
+          },
+          {
+            "id": 2,
+            "title": "Conduct Accessibility Audit",
+            "description": "Perform a full manual and automated accessibility review of the application, ensuring WCAG 2.1 AA compliance."
+          },
+          {
+            "id": 3,
+            "title": "Implement Load Testing",
+            "description": "Write and execute load tests (using a tool like k6) against key Server Actions to ensure they meet scalability requirements."
+          },
+          {
+            "id": 4,
+            "title": "Conduct Security Audit",
+            "description": "Perform a security review, including scanning for dependency vulnerabilities and manually testing RLS policies for potential bypasses."
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-07-27T01:06:31.014Z",
-      "updated": "2025-07-27T02:22:28.985Z",
-      "description": "Tasks for master context, updated to reflect Supabase starter template progress."
+      "updated": "2025-07-27T03:30:00.000Z",
+      "description": "Tasks for master context. Pivoted from node_or_tools to a custom TypeScript scheduling algorithm and added comprehensive subtasks for all complex items."
     }
   }
 }

@@ -1,42 +1,52 @@
 /**
- * @fileoverview Defines the data structures for the scheduling proof-of-concept.
- * These types are for the in-memory representation of the scheduling problem,
- * not necessarily the final database schema.
+ * @fileoverview Core data structures and type definitions for the scheduling algorithm.
  */
 
-/**
- * Represents a single employee with their qualifications and availability.
- */
-export interface Employee {
-  id: string;
+// Represents a single employee available for scheduling.
+export interface SchedulableEmployee {
+  id: string; // UUID from profiles table
   name: string;
-  // e.g., ['EMT', 'Paramedic', 'Supervisor']
-  qualifications: string[];
-  // Could be expanded to include specific unavailability windows
-  isAvailable: boolean;
+  role: 'dispatcher' | 'supervisor' | 'admin';
+  assignedPattern: '4x10' | '3x12_1x4' | null; // Example patterns
+  shiftPreferences: number[]; // Array of shift IDs
 }
 
-/**
- * Represents a single work shift that needs to be filled.
- */
-export interface Shift {
-  id: string;
-  // The start time of the shift
-  startTime: Date;
-  // The end time of the shift
-  endTime: Date;
-  // The qualification required for this shift, e.g., 'Paramedic'
-  requiredQualification: string;
-  // The employee assigned to this shift
-  assignedEmployeeId?: string;
+// Represents a shift template that can be assigned.
+export interface SchedulableShift {
+  id: number;
+  name: string;
+  startTime: Date; // Includes date and time
+  endTime: Date; // Includes date and time
+  durationHours: number;
 }
 
-/**
- * Represents the entire schedule for a given period.
- */
+// Represents a single, assigned shift in the final schedule.
+export interface AssignedShift {
+  employeeId: string;
+  shiftId: number;
+  date: Date;
+}
+
+// Defines the staffing requirements for a specific period of the day.
+export interface StaffingRequirement {
+  periodName: string;
+  startTime: string; // "HH:mm:ss"
+  endTime: string; // "HH:mm:ss"
+  minEmployees: number;
+  minSupervisors: number;
+}
+
+// The main schedule object that the algorithm will build.
 export interface Schedule {
-  // A list of all shifts to be scheduled
-  shifts: Shift[];
-  // A list of all employees available for the scheduling period
-  employees: Employee[];
+  startDate: Date;
+  endDate: Date;
+  assignments: AssignedShift[];
+}
+
+// Internal state used by the algorithm to track an employee's status.
+export interface EmployeeSchedulingState {
+  weeklyHours: number;
+  consecutiveDaysWorked: number;
+  lastDayOff: Date | null;
+  assignedShifts: { [date: string]: number }; // Key: "YYYY-MM-DD", Value: shiftId
 }

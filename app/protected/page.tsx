@@ -1,15 +1,15 @@
-import { redirect } from "next/navigation";
+import { redirect } from 'next/navigation';
 
-import { createClient } from "@/lib/supabase/server";
-import { InfoIcon } from "lucide-react";
-import { FetchDataSteps } from "@/components/tutorial/fetch-data-steps";
+import { createClient } from '@/lib/supabase/server';
+import { InfoIcon } from 'lucide-react';
+// Tutorial component removed - not implemented yet
 
 export default async function ProtectedPage() {
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.getClaims();
   if (error || !data?.claims) {
-    redirect("/auth/login");
+    redirect('/auth/login');
   }
 
   return (
@@ -29,7 +29,7 @@ export default async function ProtectedPage() {
       </div>
       <div>
         <h2 className="font-bold text-2xl mb-4">Next steps</h2>
-        <FetchDataSteps />
+        <div>Fetch data steps will be implemented here</div>
       </div>
     </div>
   );
