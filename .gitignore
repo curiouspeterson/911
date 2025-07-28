@@ -65,3 +65,6 @@ node_modules/
 # tasks/ 
 
 /lib/generated/prisma
+
+# Gemini/MCP configuration files (contain API keys)
+.gemini/
