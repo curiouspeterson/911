@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
+ * Updated to use global Vitest functions - removed explicit imports
  */
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ScheduleFilters } from './schedule-filters';
 

@@ -1,5 +1,6 @@
 /**
  * @vitest-environment jsdom
+ * Updated to use global Vitest functions
  */
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ProfileForm from './profile-form'; // Component doesn't exist yet

@@ -27,6 +27,7 @@ model Shift {
   endTime                DateTime   @map("end_time") @db.Timestamptz(6)
   assigned_employee_id   String?    @db.Uuid
   required_qualification String?
+  department             String?
   created_at             DateTime   @default(now()) @db.Timestamptz(6)
   employees              employees? @relation(fields: [assigned_employee_id], references: [id], onUpdate: NoAction)
   schedules              Schedule   @relation(fields: [schedule_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -373,7 +374,7 @@ model users {
   mfa_factors                 mfa_factors[]
   one_time_tokens             one_time_tokens[]
   sessions                    sessions[]
-  employees                   employees?
+  employee                    employees?
 
   @@index([instance_id])
   @@index([is_anonymous])
@@ -395,16 +396,18 @@ model employee_roles {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model employees {
-  id                String           @id @db.Uuid
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id           String?          @unique @db.Uuid
   first_name        String
   last_name         String
   email             String           @unique
   phone_number      String?
+  department        String?
   created_at        DateTime         @default(now()) @db.Timestamptz(6)
   employee_roles    employee_roles[]
-  users             users            @relation(fields: [id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   shifts            Shift[]
   time_off_requests TimeOffRequest[]
+  users             users?           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@schema("public")
 }

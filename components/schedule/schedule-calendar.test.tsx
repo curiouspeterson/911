@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
+ * Updated to use global Vitest functions - removed explicit imports
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { ScheduleCalendar } from './schedule-calendar';
 
